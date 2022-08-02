@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="MemberBoardMapper">
+
+	<select id="searchListCount" parameterType="kr.co.ictedu.util.dto.SearchDTO" resultType="int">
+		select count(mb.board_no) cnt from memberboard mb, member m 
+		where mb.mno = m.mno
+		<if test="searchOption != null and searchOption != ''
+					and searchWord != null and searchWord != ''">
+			<choose>
+				<when test="searchOption == 'title'">
+					and mb.title like concat('%', #{searchWord}, '%')
+				</when>
+				<when test="searchOption == 'mid'">
+					and m.mid like concat('%', #{searchWord}, '%')
+				</when>
+			</choose>
+		</if>
+	</select>
+
+	<select id="searchList" parameterType="kr.co.ictedu.util.dto.SearchDTO"
+							resultType="kr.co.ictedu.board.member.MemberBoardDTO">
+		select board_no, title, mb.mno, m.mid, write_date, view_count
+		from memberboard mb, member m
+		where mb.mno = m.mno
+		<if test="searchOption != null and searchOption != ''
+					and searchWord != null and searchWord != ''">
+			<choose>
+				<when test="searchOption == 'title'">
+				and mb.title like concat('%', #{searchWord}, '%')
+				</when>
+				<when test="searchOption == 'mid'">
+				and m.mid like concat('%', #{searchWord}, '%')
+				</when>
+			</choose>
+		</if>
+		order by board_no desc
+		limit #{limitNum}, 10
+	</select>
+
+	<update id="incrementViewCnt" parameterType="java.lang.String">
+	update memberboard set view_count = view_count + 1
+	where board_no = #{board_no}
+	</update>
+
+	<update id="update" parameterType="kr.co.ictedu.board.member.MemberBoardDTO">
+	update memberboard set title = #{title}, contents = #{contents}
+	where board_no = #{board_no}
+	</update>
+	
+	<delete id="delete" parameterType="kr.co.ictedu.board.member.MemberBoardDTO">
+	delete from memberboard where board_no = #{board_no}
+	</delete>
+
+	<select id="detail" parameterType="java.lang.String" resultType="kr.co.ictedu.board.member.MemberBoardDTO">
+	select mb.board_no, mb.title, mb.mno, m.mid, mb.contents, mb.write_date, mb.view_count
+	from memberboard mb, member m
+	where mb.board_no = #{board_no} and mb.mno = m.mno
+	</select>
+
+	<insert id="write" parameterType="kr.co.ictedu.board.member.MemberBoardDTO">
+	insert into memberboard (title, mno, contents, view_count, write_date)
+	values( #{title}, #{mno}, #{contents}, 0, now() )
+	</insert>
+	
+</mapper>

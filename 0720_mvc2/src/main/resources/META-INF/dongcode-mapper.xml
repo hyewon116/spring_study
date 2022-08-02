@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+ 
+<mapper namespace="DongCodeMapper">
+
+	<select id="dongName" parameterType="java.lang.String" resultType="kr.co.ictedu.test.DongCodeDTO">
+	select dong_code, dong_name
+	from code_dong
+	where dong_name like concat('%', #{key_word} , '%')
+	</select>
+	
+	<select id="dongSelect" parameterType="java.lang.String" resultType="kr.co.ictedu.test.DongCodeDTO">
+	select dong_code, dong_name
+	from code_dong
+	where left( dong_code, 5 ) = left( #{gugun_code}, 5 )
+	</select>
+	
+	<select id="gugunSelect" parameterType="java.lang.String" resultType="kr.co.ictedu.test.DongCodeDTO">
+	select gugun_code, gugun_name
+	from code_gugun
+	where left( gugun_code, 2 ) = left( #{sido_code}, 2 )
+	</select>
+	
+	<select id="sidoSelect" resultType="kr.co.ictedu.test.DongCodeDTO">
+	select sido_code, sido_name
+	from code_sido
+	order by sido_code
+	</select>
+	
+</mapper>
