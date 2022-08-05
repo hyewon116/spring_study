@@ -11,6 +11,7 @@
  		<mapper resource="META-INF/join-mapper.xml" />
  		<mapper resource="META-INF/memberboard-mapper.xml" />
  		<mapper resource="META-INF/dongcode-mapper.xml" />
+ 		<mapper resource="META-INF/product-mapper.xml" />
 	</mappers>
 
 </configuration>

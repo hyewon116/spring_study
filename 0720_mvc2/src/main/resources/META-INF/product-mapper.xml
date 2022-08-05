@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+	PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+	"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="ProductMapper">
+
+	<update id="delete" parameterType="kr.co.ictedu.product.ProductDTO">
+	update product
+	set del_yn = 1
+	, del_date = now()
+	where prdt_no = #{prdt_no}
+	and mno = #{mno}
+	</update>
+
+	<update id="incrementViewCnt" parameterType="java.lang.String">
+	update product
+	set view_cnt = view_cnt + 1
+	where prdt_no = #{prdt_no}
+	</update>
+
+	<select id="detail" parameterType="java.lang.String" resultType="kr.co.ictedu.product.ProductDTO">
+	select p.prdt_no, p.prdt_name, p.mno, m.mid, p.qty, p.price, p.discount
+	, truncate( p.price - (p.price / 100 * p.discount), 0 ) sale_price
+	, p.description, p.view_cnt, p.reg_date
+	, p.thumbnail_name, p.thumbnail_path, p.prdt_img_name, p.prdt_img_path
+	, p.desc_img_name, p.desc_img_path, p.add_file_name, p.add_file_path
+   	from product p, member m
+	where p.prdt_no = #{prdt_no}
+	and del_yn = 0
+	and p.mno = m.mno
+	</select>
+
+	<select id="selectList" parameterType="kr.co.ictedu.util.dto.SearchDTO"
+			resultType="kr.co.ictedu.product.ProductDTO">
+		select p.prdt_no, p.prdt_name, p.mno, m.mid, p.qty, p.price, p.discount
+		, truncate( p.price - (p.price / 100 * p.discount), 0 ) sale_price
+		, p.description, p.view_cnt, p.reg_date
+		, p.thumbnail_name, p.thumbnail_path, p.prdt_img_name, p.prdt_img_path
+		, p.desc_img_name, p.desc_img_path, p.add_file_name, p.add_file_path
+    	from product p, member m
+		where del_yn = 0
+		<if test="searchOption != null and searchOption != ''
+					and searchWord != null and searchWord !=''">
+			<choose>
+				<when test="searchOption == 'prdt_name'">
+					and p.prdt_name like concat('%', #{searchWord}, '%')
+				</when>
+				<when test="searchOption == 'mid'">
+					and m.mid like concat('%', #{searchWord}, '%')
+				</when>
+			</choose>
+		</if>
+		and p.mno = m.mno
+		order by prdt_no desc
+		limit #{limitNum}, 10
+	</select>
+
+	<select id="searchListCount" parameterType="kr.co.ictedu.util.dto.SearchDTO" resultType="int">
+		select count(p.prdt_no) cnt
+		from product p, member m
+		where del_yn = 0
+		<if test="searchOption != null and searchOption != ''
+					and searchWord != null and searchWord !=''">
+			<choose>
+				<when test="searchOption == 'prdt_name'">
+					and p.prdt_name like concat('%', #{searchWord}, '%')
+				</when>
+				<when test="searchOption == 'mid'">
+					and m.mid like concat('%', #{searchWord}, '%')
+				</when>
+			</choose>
+		</if>
+		and p.mno = m.mno
+	</select>
+
+	<insert id="insert" parameterType="kr.co.ictedu.product.ProductDTO">
+	INSERT INTO product (prdt_name, mno , qty, price, discount, description, reg_date
+						, thumbnail_name, thumbnail_path, prdt_img_name, prdt_img_path
+						, desc_img_name, desc_img_path, add_file_name, add_file_path)
+	VALUES(#{prdt_name}, #{mno} , #{qty}, #{price}, #{discount}, #{description}, now()
+			, #{thumbnail_name}, #{thumbnail_path}, #{prdt_img_name}, #{prdt_img_path}
+			, #{desc_img_name}, #{desc_img_path}, #{add_file_name}, #{add_file_path})
+	</insert>
+
+</mapper>
